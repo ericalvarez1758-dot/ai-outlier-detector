@@ -86,6 +86,121 @@ def check_environment() -> bool:
     return True
 
 
+def upload_to_google_sheets():
+    """Upload outliers to Google Sheets."""
+    print_header("UPLOADING TO GOOGLE SHEETS")
+
+    try:
+        import gspread
+        from google.oauth2.service_account import Credentials
+        import csv
+
+        # Check if credentials file exists
+        if not os.path.exists('credentials.json'):
+            print("⚠ credentials.json not found - skipping Google Sheets upload")
+            return False
+
+        print("✓ Found credentials.json")
+
+        # Load outliers from CSV
+        if not os.path.exists('output/outliers.csv'):
+            print("⚠ outliers.csv not found - skipping upload")
+            return False
+
+        with open('output/outliers.csv', 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            outliers = list(reader)
+
+        if len(outliers) == 0:
+            print("⚠ No outliers to upload")
+            return False
+
+        print(f"✓ Loaded {len(outliers)} outliers from CSV")
+
+        # Setup credentials
+        scopes = [
+            'https://www.googleapis.com/auth/spreadsheets',
+            'https://www.googleapis.com/auth/drive'
+        ]
+
+        creds = Credentials.from_service_account_file('credentials.json', scopes=scopes)
+        client = gspread.authorize(creds)
+
+        print("✓ Authenticated with Google")
+
+        # Open or create the sheet
+        try:
+            spreadsheet = client.open('YT outlier')
+            sheet = spreadsheet.sheet1
+            print("✓ Opened existing 'YT outlier' sheet")
+        except gspread.SpreadsheetNotFound:
+            spreadsheet = client.create('YT outlier')
+            sheet = spreadsheet.sheet1
+            print("✓ Created new 'YT outlier' sheet")
+
+        # Clear existing data
+        sheet.clear()
+        print("✓ Cleared existing data")
+
+        # Prepare headers
+        headers = [
+            'Channel', 'Video Title', 'Thumbnail', 'URL', 'Publish Date',
+            'Days Since', 'Views', 'Views/Day', 'Baseline VPD',
+            'Outlier Score', 'Recency Boost', 'Final Score',
+            'Type', 'Bucket'
+        ]
+
+        # Prepare data rows
+        rows = [headers]
+
+        for outlier in outliers:
+            # Use =IMAGE() formula for thumbnail
+            thumbnail_formula = f'=IMAGE("{outlier.get("thumbnail_url", "")}")' if outlier.get('thumbnail_url') else ''
+
+            row = [
+                outlier.get('channel', ''),
+                outlier.get('title', ''),
+                thumbnail_formula,  # Thumbnail with IMAGE formula
+                outlier.get('url', ''),
+                outlier.get('published_at', ''),
+                outlier.get('age_days', ''),
+                outlier.get('views', ''),
+                outlier.get('views_per_day', ''),
+                outlier.get('baseline_vpd', ''),
+                outlier.get('outlier_score', ''),
+                outlier.get('recency_boost', ''),
+                outlier.get('recency_boosted_score', ''),
+                'Sleep' if outlier.get('is_sleep_style', '').lower() == 'true' else 'Normal',
+                outlier.get('bucket', '')
+            ]
+            rows.append(row)
+
+        # Upload all data at once
+        sheet.update('A1', rows)
+        print(f"✓ Uploaded {len(outliers)} outliers to Google Sheets")
+
+        # Format the sheet
+        sheet.format('A1:N1', {
+            'textFormat': {'bold': True},
+            'backgroundColor': {'red': 0.9, 'green': 0.9, 'blue': 0.9}
+        })
+
+        # Set column widths
+        sheet.set_column_width('B', 400)  # Video Title
+        sheet.set_column_width('C', 150)  # Thumbnail
+
+        print(f"✓ Sheet URL: {spreadsheet.url}")
+
+        return True
+
+    except ImportError:
+        print("⚠ gspread not installed - skipping Google Sheets upload")
+        return False
+    except Exception as e:
+        print(f"✗ Error uploading to Google Sheets: {e}")
+        return False
+
+
 def print_results():
     """Print final results summary."""
     print_header("PIPELINE COMPLETE")
@@ -161,6 +276,9 @@ def main():
     if not run_step('summarize_patterns.py', 'Generate Patterns & Ideas'):
         print("\n✗ Pipeline failed at Step 3")
         sys.exit(1)
+
+    # Step 4: Upload to Google Sheets
+    upload_to_google_sheets()
 
     # Print results
     print_results()
