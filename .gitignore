@@ -2,6 +2,7 @@
 *.csv
 outliers.csv
 competitor_outliers.csv
+output/
 
 # Test files
 test_channels.txt
