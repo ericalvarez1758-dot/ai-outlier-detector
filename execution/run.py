@@ -92,7 +92,7 @@ def upload_to_google_sheets():
 
     try:
         import gspread
-        from google.oauth2.service_account import Credentials
+        from oauth2client.service_account import ServiceAccountCredentials
         import csv
 
         # Check if credentials file exists
@@ -119,11 +119,11 @@ def upload_to_google_sheets():
 
         # Setup credentials
         scopes = [
-            'https://www.googleapis.com/auth/spreadsheets',
+            'https://spreadsheets.google.com/feeds',
             'https://www.googleapis.com/auth/drive'
         ]
 
-        creds = Credentials.from_service_account_file('credentials.json', scopes=scopes)
+        creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scopes)
         client = gspread.authorize(creds)
 
         print("✓ Authenticated with Google")
@@ -138,66 +138,59 @@ def upload_to_google_sheets():
             sheet = spreadsheet.sheet1
             print("✓ Created new 'YT outlier' sheet")
 
-        # Clear existing data
-        sheet.clear()
-        print("✓ Cleared existing data")
+        # Check if sheet is empty (needs headers)
+        existing_data = sheet.get_all_values()
 
-        # Prepare headers
-        headers = [
-            'Channel', 'Video Title', 'Thumbnail', 'URL', 'Publish Date',
-            'Days Since', 'Views', 'Views/Day', 'Baseline VPD',
-            'Outlier Score', 'Recency Boost', 'Final Score',
-            'Type', 'Bucket'
-        ]
+        if not existing_data or len(existing_data) == 0:
+            # Write headers
+            headers = ['Date', 'Channel', 'Title', 'Views', 'Outlier Score', 'Video URL', 'Thumbnail']
+            sheet.append_row(headers)
+            print("✓ Added headers to sheet")
+
+            # Format headers
+            sheet.format('A1:G1', {
+                'textFormat': {'bold': True},
+                'backgroundColor': {'red': 0.9, 'green': 0.9, 'blue': 0.9}
+            })
 
         # Prepare data rows
-        rows = [headers]
+        today = datetime.now().strftime('%Y-%m-%d')
 
         for outlier in outliers:
             # Use =IMAGE() formula for thumbnail
-            thumbnail_formula = f'=IMAGE("{outlier.get("thumbnail_url", "")}")' if outlier.get('thumbnail_url') else ''
+            thumbnail_url = outlier.get('thumbnail_url', '')
+            thumbnail_formula = f'=IMAGE("{thumbnail_url}")' if thumbnail_url else ''
 
             row = [
-                outlier.get('channel', ''),
-                outlier.get('title', ''),
-                thumbnail_formula,  # Thumbnail with IMAGE formula
-                outlier.get('url', ''),
-                outlier.get('published_at', ''),
-                outlier.get('age_days', ''),
-                outlier.get('views', ''),
-                outlier.get('views_per_day', ''),
-                outlier.get('baseline_vpd', ''),
-                outlier.get('outlier_score', ''),
-                outlier.get('recency_boost', ''),
-                outlier.get('recency_boosted_score', ''),
-                'Sleep' if outlier.get('is_sleep_style', '').lower() == 'true' else 'Normal',
-                outlier.get('bucket', '')
+                today,  # Date
+                outlier.get('channel', ''),  # Channel
+                outlier.get('title', ''),  # Title
+                outlier.get('views', ''),  # Views
+                outlier.get('recency_boosted_score', ''),  # Outlier Score
+                outlier.get('url', ''),  # Video URL
+                thumbnail_formula  # Thumbnail with IMAGE formula
             ]
-            rows.append(row)
 
-        # Upload all data at once
-        sheet.update('A1', rows)
-        print(f"✓ Uploaded {len(outliers)} outliers to Google Sheets")
+            sheet.append_row(row)
 
-        # Format the sheet
-        sheet.format('A1:N1', {
-            'textFormat': {'bold': True},
-            'backgroundColor': {'red': 0.9, 'green': 0.9, 'blue': 0.9}
-        })
+        print(f"✓ Appended {len(outliers)} outliers to Google Sheets")
 
         # Set column widths
-        sheet.set_column_width('B', 400)  # Video Title
-        sheet.set_column_width('C', 150)  # Thumbnail
+        sheet.set_column_width('C', 400)  # Title
+        sheet.set_column_width('G', 150)  # Thumbnail
 
         print(f"✓ Sheet URL: {spreadsheet.url}")
 
         return True
 
-    except ImportError:
-        print("⚠ gspread not installed - skipping Google Sheets upload")
+    except ImportError as e:
+        print(f"⚠ Missing library: {e}")
+        print("Install: pip install gspread oauth2client")
         return False
     except Exception as e:
         print(f"✗ Error uploading to Google Sheets: {e}")
+        import traceback
+        traceback.print_exc()
         return False
 
 
