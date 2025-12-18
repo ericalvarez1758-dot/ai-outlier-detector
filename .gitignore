@@ -1,9 +1,15 @@
 # Output files
 *.csv
 outliers.csv
+competitor_outliers.csv
 
 # Test files
 test_channels.txt
+
+# Environment variables and API keys
+.env
+*.env
+!.env.example
 
 # Google Sheets credentials
 service_account.json

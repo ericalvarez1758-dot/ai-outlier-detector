@@ -1,5 +1,8 @@
-# Core dependencies
+# Core dependencies (yt-dlp version)
 yt-dlp>=2023.12.30
+
+# TubeLab version dependencies
+requests>=2.31.0
 
 # Optional: Google Sheets integration
 # Uncomment if you want to use --sheet flag

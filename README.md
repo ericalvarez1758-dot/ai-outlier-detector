@@ -2,7 +2,27 @@
 
 A **FREE** YouTube analytics tool that identifies videos significantly outperforming a channel's typical performance. No API keys required!
 
-## Features
+## 📦 Two Versions Available
+
+### 1. Free Version (This README) - `outlier_detector.py`
+- ✅ **100% Free** - Uses `yt-dlp`, no API costs
+- 🎯 **General purpose** - Analyze any YouTube channels
+- 📊 **Basic outlier detection** - Standard scoring algorithm
+- 👉 **Start here** if you're new or want to test the concept
+
+### 2. TubeLab Version (Advanced) - `tubelab_outlier_detector.py`
+- 💰 **$29/month** - Requires TubeLab API subscription
+- 🎮 **Sleep/ASMR gaming niche** - Optimized for specific competitor list
+- 🧠 **Advanced scoring** - Recency-focused, penalizes evergreen content
+- 📈 **Revenue estimates** - See which competitors monetize well
+- 🔬 **Content analysis** - Auto-detects games, sound types, packaging
+- 👉 **See [TUBELAB_README.md](TUBELAB_README.md)** for full details
+
+**Quick decision:** Use the free version for general analysis, TubeLab version for serious competitor research in sleep gaming niche.
+
+---
+
+## Features (Free Version)
 
 - ✅ **100% Free** - Uses `yt-dlp` instead of paid YouTube APIs
 - 📊 **Smart Scoring** - Combines outlier detection with recency boost
