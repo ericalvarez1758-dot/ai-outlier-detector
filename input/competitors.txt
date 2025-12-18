@@ -1,0 +1,10 @@
+# Pokémon Sleep Content Competitors
+# One channel name per line
+
+Fallasleepmon
+Boring Gamer
+Stellar Sleep
+BlueBoyPhin
+Sleepy Gamer
+PokeSleep
+PokeRest

@@ -1,0 +1,135 @@
+# Pokémon Content Keywords (for validation)
+# Videos must contain at least one of these in title or description
+
+# Core terms
+pokémon
+pokemon
+poke
+
+# Popular Pokémon
+pikachu
+charizard
+mewtwo
+mew
+eevee
+snorlax
+gengar
+dragonite
+gyarados
+alakazam
+machamp
+blastoise
+venusaur
+articuno
+zapdos
+moltres
+lugia
+ho-oh
+celebi
+kyogre
+groudon
+rayquaza
+dialga
+palkia
+giratina
+arceus
+reshiram
+zekrom
+kyurem
+xerneas
+yveltal
+zygarde
+solgaleo
+lunala
+necrozma
+zacian
+zamazenta
+eternatus
+calyrex
+koraidon
+miraidon
+
+# Regions
+kanto
+johto
+hoenn
+sinnoh
+unova
+kalos
+alola
+galar
+paldea
+
+# Game titles
+red
+blue
+yellow
+gold
+silver
+crystal
+ruby
+sapphire
+emerald
+diamond
+pearl
+platinum
+black
+white
+x
+y
+sun
+moon
+ultra
+sword
+shield
+scarlet
+violet
+legends
+arceus
+
+# Generations
+gen 1
+gen 2
+gen 3
+gen 4
+gen 5
+gen 6
+gen 7
+gen 8
+gen 9
+generation
+
+# Types
+fire type
+water type
+grass type
+electric type
+psychic type
+dark type
+dragon type
+fairy type
+ghost type
+steel type
+fighting type
+normal type
+flying type
+bug type
+rock type
+ground type
+ice type
+poison type
+
+# Concepts
+pokédex
+pokedex
+legendary
+mythical
+starter
+evolution
+mega evolution
+gigantamax
+dynamax
+terastallize
+shiny
+regional
+variant
