@@ -1,0 +1,12 @@
+# YouTube Outlier Detector - Channel List
+# Add one channel URL or @handle per line
+# Lines starting with # are comments and will be ignored
+
+# Example channels (uncomment to use):
+# @mkbhd
+# @veritasium
+# @fireship
+# @ThePrimeagen
+# @3blue1brown
+
+# Add your channels below:
